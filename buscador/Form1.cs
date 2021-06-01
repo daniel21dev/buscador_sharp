@@ -23,6 +23,7 @@ namespace buscador
         {
             string[] filePaths = Directory.GetFiles(dir, query ,SearchOption.AllDirectories );
             listBox1.Items.Clear();
+
             if( filePaths.Length == 0)
             {
                 listBox1.Items.Add("archivo no encontrado, verfique su busqueda");
@@ -33,41 +34,64 @@ namespace buscador
             }
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        void obtenerUnidades()
         {
             var drv = DriveInfo.GetDrives();
-        
+
 
             foreach (DriveInfo dInfo in drv)
             {
-                if ( dInfo.DriveType.ToString().Equals("Removable") )
+                if (dInfo.DriveType.ToString().Equals("Removable"))
                 {
                     comboBox1.Items.Add(dInfo.Name);
                 }
-                
-            }
 
+            }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            obtenerUnidades();
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var selected = comboBox1.SelectedItem.ToString();
-            obtenerArchivos(selected);
+            string archivoSeleccionado = comboBox1.SelectedItem.ToString();
+            obtenerArchivos(archivoSeleccionado);
 
         }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Process.Start(new ProcessStartInfo( listBox1.SelectedItem.ToString() ) { UseShellExecute = true });
+            try
+            {
+                Process.Start(new ProcessStartInfo( listBox1.SelectedItem.ToString() ) { UseShellExecute = true });
+            }
+            catch( Exception ex)
+            {
+                Console.WriteLine( ex );
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            var selected = comboBox1.SelectedItem.ToString();
-            String query = textBox1.Text.Trim();
+            string unidadSeleccionada = comboBox1.SelectedItem.ToString();
+            string query = textBox1.Text.Trim();
             listBox2.Items.Add( query );
-            obtenerArchivos(selected, "*"+query+"*");
-            
+            obtenerArchivos(unidadSeleccionada, "*"+query+"*"); 
+        }
+
+        private void listBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string unidadSeleccionada = comboBox1.SelectedItem.ToString();
+            string query = listBox2.SelectedItem.ToString();
+            try
+            {
+                obtenerArchivos(unidadSeleccionada, "*" + query + "*");
+            }catch( Exception ex)
+            {
+                Console.WriteLine(ex); 
+            }
         }
     }
 }
